@@ -5,13 +5,26 @@ let redisClient: RedisClientType;
 
 export const connectRedis = async (): Promise<RedisClientType> => {
   try {
-    redisClient = createClient({
-      socket: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-      },
-      password: process.env.REDIS_PASSWORD,
-    });
+    // Support both REDIS_URL (Render format) and individual host/port/password
+    const redisUrl = process.env.REDIS_URL;
+    
+    if (redisUrl) {
+      // Use connection URL (Render format)
+      redisClient = createClient({
+        url: redisUrl,
+      });
+      logger.info('Connecting to Redis using REDIS_URL');
+    } else {
+      // Fallback to individual parameters (local development)
+      redisClient = createClient({
+        socket: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT || '6379'),
+        },
+        password: process.env.REDIS_PASSWORD,
+      });
+      logger.info('Connecting to Redis using REDIS_HOST/PORT');
+    }
 
     redisClient.on('error', (err) => {
       logger.error('Redis Client Error:', err);
