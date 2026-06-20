@@ -1,13 +1,12 @@
-services:
+databases:
   # PostgreSQL Database
-  - type: pserv
-    name: cerebrexia-postgres
-    env: docker
+  - name: cerebrexia-db
+    databaseName: cerebrexia
+    user: cerebrexia
     plan: free
     region: singapore
-    databases:
-      - name: cerebrexia
-        user: cerebrexia
+
+services:
         
   # Redis Instance
   - type: redis
@@ -30,7 +29,7 @@ services:
         value: 5000
       - key: DATABASE_URL
         fromDatabase:
-          name: cerebrexia-postgres
+          name: cerebrexia-db
           property: connectionString
       - key: REDIS_URL
         fromService:
