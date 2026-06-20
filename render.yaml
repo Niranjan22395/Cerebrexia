@@ -1,0 +1,57 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: cerebrexia-postgres
+    env: docker
+    plan: free
+    region: singapore
+    databases:
+      - name: cerebrexia
+        user: cerebrexia
+        
+  # Redis Instance
+  - type: redis
+    name: cerebrexia-redis
+    plan: free
+    region: singapore
+    maxmemoryPolicy: allkeys-lru
+    
+  # Web Service (Backend + Frontend)
+  - type: web
+    name: cerebrexia-app
+    env: docker
+    region: singapore
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cerebrexia-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: cerebrexia-redis
+          type: redis
+          property: connectionString
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@cerebrexia.com
+
+# Made with Bob
