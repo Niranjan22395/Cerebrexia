@@ -56,8 +56,7 @@ app.use(helmet({
       connectSrc: [
         "'self'",
         "https://accounts.google.com",
-        "https://www.googleapis.com",
-        "http://localhost:5000"
+        "https://www.googleapis.com"
       ],
       frameSrc: [
         "'self'",
